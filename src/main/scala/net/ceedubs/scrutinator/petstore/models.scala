@@ -13,4 +13,5 @@ case class Pet(
   category: Option[Category],
   name: String,
   photoUrls: Option[List[String]],
-  tags: Option[List[Tag]])
+  tags: Option[List[Tag]],
+  status: Option[String])

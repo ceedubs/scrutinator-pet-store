@@ -31,4 +31,7 @@ object ResponseRenderer {
 
   implicit def errorsOrResultRenderer[A](implicit rendererA: ResponseRenderer[A]): ResponseRenderer[NonEmptyList[ValidationError] \/ A] =
     renderer(_.fold(errorListRenderer.apply, rendererA.apply))
+
+  implicit def listRenderer[A](implicit rendererA: ResponseRenderer[A]): ResponseRenderer[List[A]] =
+    renderer(l => Ok(s"[${l.mkString(", ")}]"))
 }

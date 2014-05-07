@@ -39,6 +39,7 @@ object PetApi {
         ('name ->> Field[String]().required()) ::
         ('photoUrls ->> Field[List[String]]()) ::
         ('tags ->> CollectionField[List].ofModel(tag)) ::
+        ('status ->> Field[String]()) ::
         HNil))
   }
 
@@ -66,20 +67,6 @@ class PetApi(petDao: PetDao)(implicit swagger: Swagger) extends PetStoreServlet 
   override protected val applicationName = Some("pets")
   override protected val applicationDescription = "Operations about pets"
 
-  val addPetFields =
-    ('body ->> JsonParam(ModelField(
-      model = Models.pet,
-      description = Some("Pet object that needs to be added to the store")))) ::
-    HNil
-
-  val addPetOp = apiOperation[Unit]("addPet").
-    summary("Add a new pet to the store").
-    withParams(addPetFields)
-
-  val addPet = renderer(petBodyValidator.map(petDao.save))
-
-  post("/", operation(addPetOp))(addPet.run(request))
-
   val getPetByIdFields =
     ('petId ->> PathParam(Field[Int](
       description = Some("ID of pet that needs to be fetched")).
@@ -96,4 +83,57 @@ class PetApi(petDao: PetDao)(implicit swagger: Swagger) extends PetStoreServlet 
 
   get("/:petId", operation(getPetByIdOp))(getPetById.run(request))
 
+  val deletePetFields =
+    ('petId ->> PathParam(Field[Int](
+      description = Some("Pet id to delete")).
+      required(_ => "A pet ID is required"))) :: HNil
+
+  val deletePetOp = apiOperation[Unit]("deletePet").
+    summary("Deletes a pet").
+    withParams(deletePetFields)
+
+  val deletePet = renderer(validator(deletePetFields).map(params =>
+    petDao.deleteById(params.get('petId))))
+
+  delete("/:petId", operation(deletePetOp))(deletePet.run(request))
+
+
+  val addPetFields =
+    ('body ->> JsonParam(ModelField(
+      model = Models.pet,
+      description = Some("Pet object that needs to be added to the store")))) :: HNil
+
+  val addPetOp = apiOperation[Unit]("addPet").
+    summary("Add a new pet to the store").
+    withParams(addPetFields)
+
+  val addPet = renderer(petBodyValidator.map(petDao.save))
+
+  post("/", operation(addPetOp))(addPet.run(request))
+
+  val updatePetFields =
+    ('body ->> JsonParam(ModelField(
+      model = Models.pet,
+      description = Some("Pet object that needs to be updated in the store")))) :: HNil
+
+  val updatePetOp = apiOperation[Unit]("updatePet").
+    summary("Update an existing pet").
+    withParams(updatePetFields)
+
+  val updatePet = renderer(petBodyValidator.map(petDao.update))
+
+  put("/", operation(updatePetOp))(updatePet.run(request))
+
+  val findPetsByStatusFields =
+    ('status ->> QueryParam(Field[Set[String]](
+      description = Some("Status values that need to be considered for filter")))) :: HNil
+
+  val findPetsByStatusOp = apiOperation[List[Pet]]("findPetsByStatus").
+    summary("Finds pets by status").
+    withParams(findPetsByStatusFields)
+
+  val findPetsByStatus = renderer(validator(findPetsByStatusFields).map(params =>
+    petDao.byStatus(params.get('status).getOrElse(Set("available")))))
+
+  get("/findByStatus", operation(findPetsByStatusOp))(findPetsByStatus.run(request))
 }
