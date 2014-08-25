@@ -55,10 +55,10 @@ javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 /* dependencies */
 libraryDependencies <++= scalaVersion { sv =>
   Seq(
-    "net.ceedubs"    %% "scrutinator"             % "0.1.0-SNAPSHOT",
-    "net.ceedubs"    %% "scrutinator-scalatra"    % "0.1.0-SNAPSHOT",
-    "net.ceedubs"    %% "scrutinator-json4s"      % "0.1.0-SNAPSHOT",
-    "net.ceedubs"    %% "scrutinator-swagger"     % "0.1.0-SNAPSHOT",
+    "net.ceedubs"    %% "scrutinator"             % "0.1.2",
+    "net.ceedubs"    %% "scrutinator-scalatra"    % "0.1.2",
+    "net.ceedubs"    %% "scrutinator-json4s"      % "0.1.2",
+    "net.ceedubs"    %% "scrutinator-swagger"     % "0.1.2",
     "org.scalatra"   %% "scalatra-scalate"        % "2.3.0.RC1")
 }
 

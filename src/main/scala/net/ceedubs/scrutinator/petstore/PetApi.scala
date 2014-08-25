@@ -50,7 +50,7 @@ object PetApi {
   val petGen = LabelledGeneric[Pet]
 
   val petBody =
-    ('body ->> JsonParam(ModelField(model = Models.pet))) ::
+    ('body ->> JsonParam(ModelField(model = Models.pet).required())) ::
     HNil
 
   val petBodyValidator = ScalatraSupport.validator(petBody).map(params =>
